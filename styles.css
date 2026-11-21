@@ -234,6 +234,22 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 @media (prefers-reduced-motion: reduce) { .prl_bead, .prl_strip { will-change: auto; } }
 
+/* Call-back band on the home page (Phil, 2026-11-21: make the call-back offer prominent) */
+.callback-band { border-block: 1px solid var(--line); }
+.cb-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+.cb-copy { display: grid; gap: 18px; }
+.cb-copy p { color: var(--text); font-size: 1.08rem; max-width: 36em; }
+.cb-steps { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; counter-reset: cb; }
+.cb-steps li { counter-increment: cb; display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 14px; row-gap: 2px;
+  padding: 16px 0; border-top: 1px solid var(--line); }
+.cb-steps li:last-child { border-bottom: 1px solid var(--line); }
+.cb-steps li::before { content: counter(cb, decimal-leading-zero); grid-row: 1 / span 2; font: 600 1.05rem/1.6 var(--font-data); color: var(--stake-deep); }
+.cb-steps strong { font: 700 1.1rem/1.3 var(--font-display); }
+.cb-steps span { color: var(--muted); }
+@media (max-width: 900px) { .cb-grid { grid-template-columns: 1fr; gap: 28px; } }
+.hero-callback { color: var(--on-ink-muted); font-size: 0.98rem; }
+.hero-callback a { color: #fff; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
 /* Sample plans */
 .plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px 20px; }
 .plans a { display: grid; gap: 4px; color: var(--text); text-decoration: none; }
