@@ -199,18 +199,40 @@ ul { margin: 0; padding: 0; list-style: none; }
 @media (max-width: 900px) { .services.three { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .services { grid-template-columns: 1fr; } }
 
-/* Process: a real sequence, so it is numbered */
-.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; counter-reset: step; }
-.steps li { counter-increment: step; padding: 22px 22px 0 0; border-top: 2px solid var(--ink-line); position: relative; display: grid; gap: 8px; align-content: start; }
-.steps li::before { content: ""; position: absolute; top: -7px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); border: 2px solid var(--brand); }
-.steps li::after { content: "STN " counter(step); font: 500 0.74rem var(--font-data); letter-spacing: .1em; color: var(--brand); order: -1; }
-.steps p { color: var(--on-ink-muted); font-size: 0.95rem; }
+/* Process rail (src/process-rail.js, from the Annnimate starter pack). As the section scrolls past, a dot draws the
+   line across the steps and each step lights up with its picture. The page is never pinned (data-anm-sticky="false").
+   Without the script the steps, numbers and pictures all simply show. */
+.prl_wrap { position: relative; width: 100%; height: var(--prl-track, auto); --prl-bead: 12px; }
+.prl_stage { position: relative; width: 100%; }
+.prl_rail { position: relative; width: 100%; }
+.prl_svg { display: block; width: 100%; height: 24px; overflow: visible; }
+.prl_svg_mobile { display: none; }
+.prl_path, .prl_path_ghost { fill: none; stroke: var(--brand-deep); stroke-width: 2; stroke-linecap: round; }
+.prl_path_ghost { stroke: var(--line); }
+.prl_bead { position: absolute; top: 0; left: 0; z-index: 2; width: var(--prl-bead); height: var(--prl-bead); border-radius: 50%;
+  background: var(--paper); border: 3px solid var(--brand-deep); box-sizing: border-box;
+  box-shadow: 0 0 0 4px var(--paper); pointer-events: none; will-change: transform; }
+.prl_steps { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; column-gap: 24px; margin: 22px 0 0; padding: 0; list-style: none; }
+.prl_step { position: relative; min-width: 0; }
+.prl_step_btn { display: block; cursor: pointer; }
+.prl_step_num { display: block; height: 1em; font: 500 0.74rem/1 var(--font-data); letter-spacing: .1em; color: var(--brand-deep); font-variant-numeric: tabular-nums; }
+.prl_col { position: relative; display: inline-block; overflow: clip; width: 0.64em; height: 1em; line-height: 1; vertical-align: baseline; }
+.prl_col::before { content: '0'; visibility: hidden; }
+.prl_strip { position: absolute; top: 0; left: 0; width: 100%; will-change: transform; }
+.prl_glyph { display: block; height: 1em; line-height: 1; text-align: center; }
+.prl_step_title { margin: 10px 0 0; font-size: 1.25rem; }
+.prl_step_text { margin: 8px 0 0; color: var(--muted); font-size: 0.95rem; }
+.prl_step_media { display: block; width: 100%; margin-top: 16px; aspect-ratio: 4 / 3; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--line); background: var(--card); transform-origin: 50% 0; }
+.prl_step_media img { display: block; width: 100%; height: 100%; object-fit: cover; }
 @media (max-width: 980px) {
-  .steps { grid-template-columns: 1fr; }
-  .steps li { border-top: 0; border-left: 2px solid var(--ink-line); padding: 0 0 28px 24px; }
-  .steps li::before { top: 0; left: -7px; }
-  .steps li:last-child { padding-bottom: 0; }
+  .prl_rail { padding-left: 44px; }
+  .prl_svg_desktop { display: none; }
+  .prl_svg_mobile { display: block; position: absolute; top: 0; left: 0; width: 44px; height: 100%; }
+  .prl_steps { grid-auto-flow: row; grid-auto-rows: auto; row-gap: 40px; column-gap: 0; margin-top: 0; }
+  .prl_step_media { max-width: 420px; }
 }
+@media (prefers-reduced-motion: reduce) { .prl_bead, .prl_strip { will-change: auto; } }
 
 /* Sample plans */
 .plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px 20px; }
@@ -260,6 +282,14 @@ ul { margin: 0; padding: 0; list-style: none; }
 .faq summary::-webkit-details-marker { display: none; }
 .faq summary::after { content: "+"; font: 400 1.5rem/1 var(--font-data); color: var(--brand-deep); text-align: center; }
 .faq details[open] summary::after { content: "\2212"; }
+.faq summary::after { transition: transform .3s ease; }
+.faq details[open] summary::after { transform: rotate(180deg); }
+.faq summary:hover { color: var(--brand-deep); }
+.faq { interpolate-size: allow-keywords; }
+.faq details::details-content { block-size: 0; overflow: hidden; opacity: 0;
+  transition: block-size .35s ease, opacity .35s ease, content-visibility .35s allow-discrete; }
+.faq details[open]::details-content { block-size: auto; opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .faq summary::after, .faq details::details-content { transition: none; } }
 .faq details p { padding: 0 40px 22px 0; color: var(--muted); max-width: 62ch; }
 .faq details p + p { margin-top: -10px; }
 
@@ -295,11 +325,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 /* "How it works": light band (was navy) */
 .band-steps { background: var(--paper); border-block: 1px solid var(--line); }
-.band-steps .steps li { border-top-color: var(--line); }
-.band-steps .steps li::before { background: var(--paper); border-color: var(--brand-deep); }
-.band-steps .steps li::after { color: var(--brand-deep); }
-.band-steps .steps p { color: var(--muted); }
-@media (max-width: 980px) { .band-steps .steps li { border-left-color: var(--line); } }
 
 /* Where we work: map with two rings */
 .area-map { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 48px; align-items: center; }
